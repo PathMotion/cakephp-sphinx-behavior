@@ -87,6 +87,12 @@ class SphinxBehavior extends ModelBehavior
                 case 'sortMode':
                     $this->runtime[$model->alias]['sphinx']->SetSortMode(key($setting), reset($setting));
                     break;
+                case 'fieldWeights':
+                    $this->runtime[$model->alias]['sphinx']->SetFieldWeights($setting);
+                    break;
+                case 'rankingMode': 
+                    $this->runtime[$model->alias]['sphinx']->SetRankingMode($setting);
+                    break;
                 default:
                     break;
             }
