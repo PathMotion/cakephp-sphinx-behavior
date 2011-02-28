@@ -1,4 +1,4 @@
-Sphinx Beahvior
+Sphinx Behavior
 ===============
 
 Credits
