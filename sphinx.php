@@ -17,6 +17,8 @@ class SphinxBehavior extends ModelBehavior
     var $runtime = array();
     var $_defaults = array('server' => 'localhost', 'port' => 3312);
 
+    var $_cached_result = array();
+
     /**
      * Spinx client object
      *
@@ -97,8 +99,7 @@ class SphinxBehavior extends ModelBehavior
                     break;
             }
         }
-        $this->runtime[$model->alias]['sphinx']->SetLimits(($query['page'] - 1) * $query['limit'],
-                                                           $query['limit']);
+        $this->runtime[$model->alias]['sphinx']->SetLimits(($query['page'] - 1) * $query['limit'], $query['limit']);
 
         $indexes = !empty($query['sphinx']['index']) ? implode(',' , $query['sphinx']['index']) : '*';
 
@@ -129,6 +130,8 @@ class SphinxBehavior extends ModelBehavior
         }
         else
         {
+            $this->_cached_result = $result;
+    
             if (isset($result['matches']))
                 $ids = array_keys($result['matches']);
             else
@@ -140,4 +143,16 @@ class SphinxBehavior extends ModelBehavior
 
         return $query;
     }
+
+
+    public function afterFind(&$model, $results, $primary) {
+        
+        foreach($results as &$result) {
+            $result[$model->name]['_weight'] = $this->_cached_result['matches'][$result[$model->name]['id']]['weight'];
+            $result[$model->name]['_total_found'] = $this->_cached_result['total_found'];
+        }
+        return $results;
+        
+    }
+
 }
