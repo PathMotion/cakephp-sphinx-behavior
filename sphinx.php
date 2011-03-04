@@ -5,7 +5,7 @@
  *
  * @copyright 2008, Vilen Tambovtsev
  * @author  Vilen Tambovtsev
- * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @license http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
 
@@ -17,7 +17,7 @@ class SphinxBehavior extends ModelBehavior
     var $runtime = array();
     var $_defaults = array('server' => 'localhost', 'port' => 3312);
 
-    var $_cached_result = array();
+    var $_cached_result = null;
 
     /**
      * Spinx client object
@@ -147,9 +147,12 @@ class SphinxBehavior extends ModelBehavior
 
     public function afterFind(&$model, $results, $primary) {
         
-        foreach($results as &$result) {
-            $result[$model->name]['_weight'] = $this->_cached_result['matches'][$result[$model->name]['id']]['weight'];
-            $result[$model->name]['_total_found'] = $this->_cached_result['total_found'];
+        if(!is_null($this->_cached_result)) {
+            foreach($results as &$result) {
+                $result[$model->name]['_weight'] = $this->_cached_result['matches'][$result[$model->name]['id']]['weight'];
+                $result[$model->name]['_total_found'] = $this->_cached_result['total_found'];
+            }
+            $this->_cached_result = null;
         }
         return $results;
         
